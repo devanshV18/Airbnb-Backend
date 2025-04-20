@@ -1,0 +1,16 @@
+ORM?ODM -> Object Relation mapping (in context of realtional DB) / Object Document mapping (in context of document absed db like mongoDB)
+
+OR?ODM are libraries that helps us write our db queries to interact with db in our native prog language and the ORM?ODM takes care of the conversion of native prog into db specific queries.Generally orm/odm are in repository level which converts object oriented code to your specid raw db query. ex - prisma, sequelize, mongoose, typeorm etc
+
+Dependencies - npm i sequelize mysql2(Mysql driver) sequelize-cli
+
+npx sequelize-cli init -> This will create the following folders in the directory where you execute it. 
+done inside src folders. threfore the below folders get created inside src folder directly however we can customise it in a way to have all the below folders inside a db folder.
+
+config -> contains the config file, which tells CLI how to connect with the database
+
+models -> contains all models for your project -> defining attributes etc.
+
+migrations -> contains all migration files -> used to create versions of our db as dbs evolve, grow and change as the product develops over time in terms of db structure, so it acts as a github for db for having versions of our db to track how your db is changed over time and over development and also can be used to revert back to any older versions of db whenever needed.
+
+seeders -> contains all seed files -> to put some initial dummy data for visulaisation or demo for collaboration and better understanding of data in complex databases. They dont impact db structure only adds data to our db tables.
