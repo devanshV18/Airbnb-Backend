@@ -14,3 +14,18 @@ models -> contains all models for your project -> defining attributes etc.
 migrations -> contains all migration files -> used to create versions of our db as dbs evolve, grow and change as the product develops over time in terms of db structure, so it acts as a github for db for having versions of our db to track how your db is changed over time and over development and also can be used to revert back to any older versions of db whenever needed.
 
 seeders -> contains all seed files -> to put some initial dummy data for visulaisation or demo for collaboration and better understanding of data in complex databases. They dont impact db structure only adds data to our db tables.
+
+
+VVIII ->
+
+How are migrations writter -> The migrations code contains two part -> Up and Down
+
+for a migration :-
+
+Up -> contains the code which will make new changes in the db when we run the migrations. 
+
+Down -> code that reverts the changes made by the migration.
+
+example -> a migration for creating a hotel table 
+up -> code to create hotel table, when migration runs the hotel table is created
+down -> code to revert the change i.e. to delete the table 
