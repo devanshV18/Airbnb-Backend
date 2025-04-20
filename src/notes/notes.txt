@@ -29,3 +29,9 @@ Down -> code that reverts the changes made by the migration.
 example -> a migration for creating a hotel table 
 up -> code to create hotel table, when migration runs the hotel table is created
 down -> code to revert the change i.e. to delete the table 
+
+
+command to create migration files -> npx sequelize-cli migration:generate --name <filename>
+command to apply migrations -> npx sequelize-cli db:migrate
+
+//check sequelize cli docs for commands
