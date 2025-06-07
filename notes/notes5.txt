@@ -5,3 +5,9 @@ WRITING API THE BOTTOM UP WAY
 2. Service Layer -> BL: Business Logic.
 
 3. Controllers -> call the service layer -> send response
+
+4. route setup
+
+5 validators
+
+6 embed validators to the routes
