@@ -1,0 +1,91 @@
+ORM
+
+Object Relation Mapping.
+
+Client -> Express Server (Written in js/TS) -> DB(Have their own QL)
+
+###
+In this case, if we want our express server to communicate with DB, we might need to write raw DB queries in our express server. Hence for simplicity and for simple tasks, if we can write some javascriptish code to interact with the db in an object oriented model, it will be much more convinient and readable. However using raw query is not at all wrong infact for complex db interaction we will still prefer to use raw queries.
+
+example - Select all hotels
+
+Raw query - select * from hotels, ORM - hotels.findAll() (javascriptish code.)
+
+Therefore for very complex queries and operations such as joins etc, we might prefer writing raw queries, but for basic and simple task its preferable to write more programming level code as they are more readable and object oriented in nature.
+
+In most of the good quality code bases, a combination of raw queries and ORM queries is used.
+
+
+## How to write such object oriented or programming language like queries as the db only understand its raw query.
+
+## To make this possible, ORM (Object relational mapper) and ODM (Object Document mapper) comes into the picture.
+ORM -> incontext of writing programming language queries for RDBMS and ODM -> in context of document/Json based DB.
+
+Definition: ORM/ODM is a library which helps us write our db interactions in our native proramming laguage like rubs, java, js/ts (mostly of our server) and library converts this programming language code into raw query of the db.
+
+####
+In MVC arch, Repository layer is responsible for DB interaction, hence all code of repo layer is about db interactions, instead of writing raw queries in repo layer we can use ORM library to write programming language based query and the ORM library is going to internaly convery object oriented/programming language code to the raw db query. (we write and ORM does the job for us.)
+
+we are using sequelize, A nodejs based ORM that can be used to interact with DB like ORacle, MYSWL, MariaDb, Postgres, SQLITE etc,
+
+
+###
+NOTE - In most cases an ORM is configured in such a way that it can interact with multiple DB. so driver library comes into play -> ORM library communicates the driver library of the corresponding database with which we want to interact. 
+for ex - sequelize use mysql2 driver library to interact to mysql.
+
+
+Also, we can bypass ORMs and directly interact with the driver library of our choice of db and interact with the db using raw queries in our code base.
+for ex - we can directly use mysql2 driver library and interact to mysql using raw queries in our node js code.
+
+
+## Steps to integrate sequelize ORM:-
+
+1. npm i sequelize 
+2. npm i mysql2
+
+## sequelize-cli : A command line interaction tool that enables us to genrate alot of sequelize file using commands.
+
+3. npm i -D sequelize-cli
+
+## Installation complete
+
+4. npx sequelize-cli init (run this command inside src folder i.e cd src and then run this command)
+
+THis command creates a models folder, a migrations folders, a seeders folder and inside the config folder it creates a config.json file
+
+## config.Json file consists info about which database sequelize need to communicate to. For instance the code has local host mentioned as ip address 127.0.0.1 which means a local server on our own machine, if we want to communicate to other machine, we can by changing the address.
+
+THis file is json file with three configs which ensures segregation of data for our project. :-
+development: Data for our development stage
+test: data for testing some features 
+production: end users data.
+
+We wont use end user data for testing purpose and etc so these config ensures data segregation for different purposes. 
+
+## models -> folders contains code related to our db schema and definition, basically the representation or attributes of our table in a form of javascript representation (classes).
+
+## seeders -> folder contain code to put dummy or seed data (initial data) to test the db and other features without having us to add initial data manually.
+
+## migrations -> used to create versions of our DB. Some featues or attributes might come up in course of project development, hence dbs grow and mature throughout development so its good to add versions and segregate db into versions based on differences and additions that arises gradually. 
+it also gives us a flexibilty to migrate between different versions of the db if needed.
+
+### NOTE -> Migrations only affect schema and structures of the DB and doesn't affetc the data present inside the db while seeders only affect the data present inside the db and doesn't effect the db schema and structure.
+
+### writing .sequelizerc file - it contains some configs and settings which will be automatically picked up by the sequelize. It has path of folders The file should be in root folder.
+
+After configuring .sequelizerc go to step 4
+
+4. *to alter folder str for sequelize initialisation: - npx sequelize-cli init
+
+5. edit config.ts
+
+6. add DB params to .env
+
+7. create a type DBConfig same as ServerConfig and export a dbConfig Object fromconfig->index.ts
+
+8. use this dbConfig object to configure the db in config.ts.
+
+9. perfrom a migration to check connection b/w server and DB.
+
+
+

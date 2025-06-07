@@ -1,0 +1,216 @@
+EXPRESS ERROR HANDLING
+
+1. Error Handling refers to how Express catches and processes errors that occur both synchronously and asynchronously.
+
+2. Errors that occur in synchronous code inside route handlers and middleware require no extra work. If synchronous code throws an error, then Express will catch and process it. For example:
+
+app.get('/', (req, res) => {
+  throw new Error('BROKEN') // Express will catch this on its own.
+})
+
+3. For errors returned from asynchronous functions invoked by route handlers and middleware, you must pass them to the next() function, where Express will catch and process them. For example:
+
+app.get('/', (req, res, next) => {
+  fs.readFile('/file-does-not-exist', (err, data) => {
+    if (err) {
+      next(err) // Pass errors to Express.
+    } else {
+      res.send(data)
+    }
+  })
+})
+
+
+Starting with Express 5, route handlers and middleware that return a Promise (Async middlewares/ async errors) will call next(error) automatically when they reject or throw an error. For example:
+
+app.get('/user/:id', async (req, res, next) => {
+  const user = await getUserById(req.params.id)
+  res.send(user)
+})
+
+If getUserById throws an error or rejects, next will be called with either the thrown error or the rejected value. If no rejected value is provided, next will be called with a default Error object provided by the Express router.
+
+4. You must catch errors that occur in asynchronous code invoked by route handlers or middleware and pass them to Express for processing. For example:
+
+app.get('/', (req, res, next) => {
+  setTimeout(() => {
+    try {
+      throw new Error('BROKEN')
+    } catch (err) {
+      next(err)
+    }
+  }, 100)
+})
+
+5. Express comes with a default error handler which is injected by express at the end of the terminal controller/middleware of the route by default. When we call the next() function with the async error we basically call the default error handler provided by express. 
+
+//vvvi 
+When you call next(error):
+
+Express bypasses all non-error-handling middleware.
+
+It jumps directly to the first error-handling middleware (those with the signature (err, req, res, next)). (exists if we define a custom error handling middleware)
+
+If no custom error middleware is defined, Express invokes its default error handler. (at the end of the flow.)
+
+6. Hence, if we pass an error to next() and you do not handle it in a custom error handler, it will be handled by the built-in error handler the error will be written to the client with the stack trace. 
+
+7. n async functions, if an error is caught and passed to next(err), it follows the above logic—skipping to error-handling middleware.
+
+//VVVII
+CRUX FROM POINT 3-7 = Express has a default error handler that is automatically added at the end of the middleware stack. When next(err) is called (e.g., from a controller or async middleware), Express skips any remaining non-error-handling middleware and passes control directly to the next error-handling middleware in the chain. If no custom error handlers are defined, Express’s built-in default error handler will handle the error.
+
+8. Alot of error handling may be done in the same way for multiple controllers where majority of the controllers might have the same or similar code handling their errors which is very tiring and unoptimised as it is repeated coding. So its better to implement a more generic or central error handler by somewhat leveraging or extending the default error handler provided to us by express. (Referring to approach at line 31 in pingHandler.ts)
+
+9. to tell express about our custom error handling functions, we specify it as a middleware usage at the end of all the routes defined in server.ts
+
+10. Starting with Express 5, route handlers and middleware that return a Promise will call next(value) automatically when they reject or throw an error. For example:
+
+app.get('/user/:id', async (req, res, next) => {
+  const user = await getUserById(req.params.id)
+  res.send(user)
+})
+
+11. Implementing a custom AppError class using interface
+
+a. interface lets us create a type/custom type.
+b. supports object oriented features such as extends/inheritance
+c. interface also acts as a contract.
+d. lets us enforce contract from multiple interfaces. (multple inheritance/ multiple contract basically)
+
+//some more examples and indepth analysis on interface
+
+ex1:
+
+//The below example demonstrates an interface acting exactly like a type
+
+interface LabledValue{
+    label: string
+}
+
+function printLabelObject(labelObj: LabledValue){
+    console.log(labelObj.label)
+}
+
+
+ex 2:
+
+//The below example demostrates how interface uses the extends keyword to inherit all the feature/properties from a class and add some more feature of our choice.
+
+interface Animal{
+    name: string
+}
+
+interface Dog extends Animal{
+    breed: stirng
+}
+
+
+//one of the most important use of interface is enforcing a contract on classes just like in C# In typescript it is enforced using implements keyword.
+
+//UNDERSTANDING THE CONCEPT OF CONTRACT ENFORCING IN DETAIL 
+
+🔧 In TypeScript, when a class implements an interface, it’s agreeing to fulfill a contract:
+It must implement all the properties and methods defined by that interface.
+If it fails to do so, TypeScript throws a compile-time error — just like a contract violation.
+
+🧠 Real-World Engineering Problem: Sensor System in a Smart Factory
+Imagine you're building a system for managing different types of IoT sensors in a smart factory (e.g., temperature, humidity, motion sensors).
+
+Each sensor must:
+
+A. Have a unique ID.
+
+B. Read data.
+
+C. Send data to the central server.
+
+This behavior is common to all sensors — and we want to enforce it using an interface.
+
+1️⃣ Define the Interface (the contract)
+
+interface Sensor {
+  id: string;
+  type: string;
+
+  readData(): number;
+  sendData(): void;
+}
+
+This interface ensures every Sensor must:
+
+Have an id and type.
+
+Implement readData() that returns a number.
+
+Implement sendData() that returns nothing.
+
+
+2️⃣ Implement the Interface in a Class
+
+1. TEMPRATURE Sensor
+
+class TemperatureSensor implements Sensor {
+  id: string;
+  type: string;
+
+  constructor(id: string) {
+    this.id = id;
+    this.type = "Temperature";
+  }
+
+  readData(): number {
+    // Simulate reading temperature data
+    return Math.random() * 100;
+  }
+
+  sendData(): void {
+    const temp = this.readData();
+    console.log(`[${this.type} - ${this.id}] Sending temperature: ${temp.toFixed(2)}°C`);
+  }
+}
+
+
+If this class misses any method or property from the Sensor interface, TypeScript will immediately throw an error. ✅ Contract enforced.
+
+2. MOTION Sensor
+
+class MotionSensor implements Sensor {
+  id: string;
+  type: string;
+
+  constructor(id: string) {
+    this.id = id;
+    this.type = "Motion";
+  }
+
+  readData(): number {
+    // Simulate motion intensity
+    return Math.floor(Math.random() * 10);
+  }
+
+  sendData(): void {
+    const motionLevel = this.readData();
+    console.log(`[${this.type} - ${this.id}] Motion detected: Level ${motionLevel}`);
+  }
+}
+
+
+4️⃣ Usage
+
+const sensors: Sensor[] = [
+  new TemperatureSensor("T-101"),
+  new MotionSensor("M-204"),
+];
+
+sensors.forEach(sensor => sensor.sendData());
+Now, you can treat all sensor objects polymorphically using the Sensor interface.
+
+✅ Summary (Crisp Recap):
+Concept	Description
+Interface	Defines a contract: required properties and methods.
+Implements	A class promises to follow the interface.
+Enforcement	TypeScript ensures the class follows the contract — else compile-time error.
+Use Case	Makes systems robust, predictable, and extensible — e.g., adding new sensors in future.
+
+

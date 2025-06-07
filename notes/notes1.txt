@@ -1,0 +1,38 @@
+In one url, we can can have multiple url params.
+
+Query params are the last part of the url string and it always comes at the end of the url after the question mark.
+
+Json is not type safe inherently. so we use a validation layer using middleware as they are very useful in passing req from one middleware to another.
+
+In a url/req -> we can have qparams, url params, req body all three being sent at the same time.
+
+zod can be best effectively used by following the docs in projects as per requirements.
+
+How zod works - zod works on basis of schema, it takes two things - one is the schema that defines what is the format or schema we are expecting and second is the object to be validated, or the object which we want to compare with the provided schema if they match or not.
+
+so we have effectively three vars :- 1. objSchema, 2. obj (to be tested), 3. result 
+
+result = objSchema.parse(object) //the format of zod usage
+
+if validation is not done, it throws a zodError.
+
+NOTE - we can use parse for sync flow and parseAsync for a non blocking async flow.
+
+A good flow to implement zod is to create a validator layer where we can create a generic function that takes schemas for object testing, and this generic fxn can asynchronously run a suitable middleware to validate the req.body object. Basically in our req res cycle when we want to validate we call this generic fxn and this generic fxn returns a middleware which has the access to req, res, next as well as the passed schema so we can handle both cases - successful validation and failded validation classes.
+
+
+///vvvviiii
+//EXPLANATION FOR THE validators->index.ts return usage or non usage and reasons:- 
+
+//note -> for a middleware function (either a standalone one or a returned middlware function), express expects it to return void (for sync middleware) or Promise<void> (for async middleware) but not a response object, hence in the index.ts of validators layer we cant write return res.... rather res automatically handles it.
+
+This is because :- In Express:
+Middleware is designed to handle, process, or pass along the request.
+
+You either:
+Call next() → to pass control to the next middleware
+Or 
+send a response via res.send() / res.json() etc. → to end the flow
+
+//vvvi -> In async middleware, the function returns a Promise.
+If you're using async, TypeScript says your function returns Promise<void> — meaning "You're returning a promise, but when it resolves, it still doesn't give back any value."
