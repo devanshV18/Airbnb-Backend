@@ -1,0 +1,7 @@
+WRITING API THE BOTTOM UP WAY
+
+1. Repo layer -> ORM or raw queries.
+
+2. Service Layer -> BL: Business Logic.
+
+3. Controllers -> call the service layer -> send response

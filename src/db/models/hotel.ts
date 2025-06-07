@@ -9,8 +9,8 @@ class Hotel extends Model<InferAttributes<Hotel>, InferCreationAttributes<Hotel>
     declare location: string
     declare createdAt: CreationOptional<Date>
     declare updatedAt: CreationOptional<Date>
-    declare rating: number
-    declare ratingCount: number 
+    declare rating?: number
+    declare ratingCount?: number 
 }
 
 // init - the init function tells us that the Model (any model - hotel, user etc) is going to map with which table in the db and each class var of the model in going to map with which column in the db.
