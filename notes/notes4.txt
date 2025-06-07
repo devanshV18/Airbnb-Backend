@@ -85,7 +85,23 @@ After configuring .sequelizerc go to step 4
 
 8. use this dbConfig object to configure the db in config.ts.
 
-9. perfrom a migration to check connection b/w server and DB. Hello 
+9. perfrom a migration to check connection b/w server and DB
+
+
+## writing migrations using sequelize-cli
+
+using sequelize-cli, we can create migration files automatically and then write code inside it.
+
+command -> npx sequelize-cli migration:generate --name <migration-file-name>
+
+the migration file has two functions -> async up and async down
+
+Async up = code which performs the changes in the db when we run the migration.
+Async down = code which revert the changes made by the up code of this migration file
+
+ex: in a migration we are creating a table so the async up of this migration file creates the table and the async down part of the migration we are going to drop the table.
+
+### NOTE - in migration files, we can write raw queries and object oriented queries using queryInterface.
 
 
 
