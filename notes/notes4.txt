@@ -85,7 +85,7 @@ After configuring .sequelizerc go to step 4
 
 8. use this dbConfig object to configure the db in config.ts.
 
-9. perfrom a migration to check connection b/w server and DB.
+9. perfrom a migration to check connection b/w server and DB. Hello 
 
 
 
