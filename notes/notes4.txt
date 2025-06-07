@@ -122,3 +122,95 @@ module.exports = config
 
 and also update path of configpath to ./src/config/sequelize.config.js in .sequelizerc file
 
+
+##### IMPORTANT EXAMPLE ABOUT MIGRATION ROLLBACK IN SEQUELIZE CLI ####
+
+Absolutely, Devansh! Let's break it down **super simply** with a real-world analogy and plain words.
+
+---
+
+### 🔧 Imagine this:
+
+You’re building a **hotel app**, and you do these migrations (changes to DB):
+
+1. ✅ `20240601090000-create-users.js` → adds Users table
+2. ✅ `20240602100000-create-hotels.js` → adds Hotels table
+3. ✅ `20240603110000-create-bookings.js` → adds Bookings table
+
+These files are applied one-by-one in order.
+
+---
+
+### 🧼 Now you want to *undo* some changes?
+
+You have **two options**:
+
+---
+
+### 🔁 1. **Undo everything**
+
+```bash
+npx sequelize-cli db:migrate:undo:all
+```
+
+This will:
+
+* Undo **all migrations** in reverse order (like pressing Ctrl+Z repeatedly).
+* DB becomes like it was before any migration ran.
+
+---
+
+### 🎯 2. **Undo up to a specific migration**
+
+```bash
+npx sequelize-cli db:migrate:undo:all --to 20240602100000-create-hotels.js
+```
+
+This will:
+
+* Undo **everything AFTER** the `create-hotels.js` file.
+* So in our case, it undoes only `create-bookings.js`, and **keeps the users and hotels tables**.
+
+It's like saying:
+
+> “Take me back to the state of DB *right after* create-hotels was done.”
+
+---
+
+### ✅ In super simple terms:
+
+> `--to` option is like saying:
+> "Undo everything until this file — but **keep this file and everything before it.**"
+
+---
+
+Let me know if you want me to show how to check current migration history or help you try this practically.
+
+
+#### MODELS LAYER -> It ensures that whatever is the schema in our db, wrt that same scheam we have a class avialable in js or ts through which we can interact with tha DB. Hence we want to have a class having a same structure like in our db. THis class is going to technically represent our DB in the javascript/typescript notations or simply programming language world. Thats what is effectively called models.
+
+### Whenever a model instance is created and not propogated it into the db, the instance is in js/ts world not in actual db, the instance wont be having any id in the db. 
+
+
+So we can use:
+1. Optional attributes around this
+
+type UserCreationAttributes = Optional<UserAttributes, 'id'>
+
+class User extends Model<UserAttributes, UserCreationAttributes> {
+    declare id: number,
+    declare name: string
+}
+
+Similarly we have a method using InferAttributes and InferCreationAttributes and a CreationalOptinal attribute to mark a particular attribute as optional in the typescript/js world. such as id of the user. (when instanc is not propogated to the db.)
+
+js/ts world query:-
+
+Model.create -> created and propogated to db
+Model.build -> only js/ts object, futher we can use instance.save() to our sql db. (we can perform some processing i we want in b/w)
+
+So if we want to create some instances in ts we mark some property as optional until we plan to propogate them to the db. 
+
+
+
+
