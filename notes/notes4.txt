@@ -111,3 +111,14 @@ command -> npx sequelize-cli db:migrate
 ### reverting a migration (the last or latest migration)
 command -> npx sequelize-cli db:migrate:undo
 
+
+##### NOTE -> Inorder to use sequelize with typescript first approach :- 
+
+create a file in config folder as sequelize.config.js and add the below code in it.
+
+require('ts-node/register')
+const config = require('./config')
+module.exports = config
+
+and also update path of configpath to ./src/config/sequelize.config.js in .sequelizerc file
+
