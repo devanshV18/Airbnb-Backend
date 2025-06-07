@@ -10,7 +10,7 @@ class Hotel extends Model<InferAttributes<Hotel>, InferCreationAttributes<Hotel>
     declare createdAt: CreationOptional<Date>
     declare updatedAt: CreationOptional<Date>
     declare rating: number
-    declare rating_count: number 
+    declare ratingCount: number 
 }
 
 // init - the init function tells us that the Model (any model - hotel, user etc) is going to map with which table in the db and each class var of the model in going to map with which column in the db.
@@ -45,7 +45,7 @@ Hotel.init({
         type: "FLOAT",
         defaultValue: null
      },
-     rating_count: {
+     ratingCount: {
         type: "INTEGER",
         defaultValue: null
      }
