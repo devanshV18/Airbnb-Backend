@@ -1,7 +1,6 @@
-import { QueryInterface } from "sequelize"
 
 module.exports = {
-  async up (queryInterface: QueryInterface) {
+  async up (queryInterface) {
     await queryInterface.sequelize.query(`
       CREATE TABLE IF NOT EXISTS hotels(
       id INT AUTO_INCREMENT PRIMARY KEY,
@@ -13,7 +12,7 @@ module.exports = {
       );`)
   },
 
-  async down (queryInterface: QueryInterface) {
+  async down (queryInterface) {
   await queryInterface.sequelize.query(`
     DROP TABLE IF EXISTS hotels;`)
   }

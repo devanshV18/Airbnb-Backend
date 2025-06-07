@@ -103,5 +103,10 @@ ex: in a migration we are creating a table so the async up of this migration fil
 
 ### NOTE - in migration files, we can write raw queries and object oriented queries using queryInterface.
 
+### Note -> Explore sequelize-cli commands
+
+### running a migration 
+command -> npx sequelize-cli db:migrate
+
 
 
