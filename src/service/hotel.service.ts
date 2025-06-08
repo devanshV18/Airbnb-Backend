@@ -1,4 +1,4 @@
-import { createHotel, getHotelbyId } from "../repositories/hotel.repository";
+import { createHotel, getAllHotels, getHotelbyId } from "../repositories/hotel.repository";
 import { createHotelDto } from "../dto/hotel.dto";
 import { ForbiddenError } from "../utils/errors/app.error";
 
@@ -11,7 +11,7 @@ import { ForbiddenError } from "../utils/errors/app.error";
 export async function createHotelService(hotelData: createHotelDto) {
     // if (isAddressBlockListed(hotelData.address)) {
     //     throw new ForbiddenError("Hotel address is blocklisted.");
-    // } //A demo of BL indeoendednt of DB
+    // } //A demo of BL independednt of DB
     const hotel = await createHotel(hotelData);
     return hotel;
 }
@@ -19,4 +19,9 @@ export async function createHotelService(hotelData: createHotelDto) {
 export async function getHotelByIdService(id: number) {
     const hotel = await getHotelbyId(id);
     return hotel;
+}
+
+export async function getAllHotelService(){
+    const hotels = await getAllHotels()
+    return hotels;
 }

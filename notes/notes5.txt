@@ -12,4 +12,4 @@ WRITING API THE BOTTOM UP WAY
 
 6 embed validators to the routes
 
-//todo -> getAllHotelhandler, deleteHotelHandler, UpdateHotelHandler
+//todo -> getAllHotelhandler, deleteHotelHandlerbyId, UpdateHotelHandler
