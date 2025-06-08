@@ -29,9 +29,14 @@ export async function getHotelbyId(id: number){
             throw new InternalServerError(`Error fetching hotel with id ${id} at the repository level.`)
         }
     }
+
 export async function getAllHotels(){
     try {
-        const hotels = await Hotel.findAll();
+        const hotels = await Hotel.findAll({
+            where: {
+                deletedAt: null 
+            }
+        });
         if(hotels.length === 0){
             logger.warn(`No hotels found`);
         }
@@ -42,32 +47,24 @@ export async function getAllHotels(){
     }
 }
 
-export async function deleteHotelById(id: number){
+export async function softDeleteHotelById(id: number){
     try {
-        const hotelExists = await Hotel.findByPk(id)
+        const hotel = await Hotel.findByPk(id)
 
-        if(!hotelExists){
-            logger.warn(`Hotel with ${id} not found`);
-            throw new NotFoundError(`Requested hotel to delete with id ${id} not found`);
-        }
-        
-        const isDeleted = await Hotel.destroy({
-            where: {
-                id: id
-            }
-        })
-
-        if(isDeleted === 0){
-            logger.warn(`Hotel with id ${id} was not deleted`);
-            throw new ForbiddenError(`Hotel with id ${id} was not deleted`);
+        if(!hotel){
+            logger.warn(`Hotel with id ${id} not found for deletion`);
+            throw new NotFoundError(`Hotel requested to be deleted with id ${id} not found`);
         }
 
-        return isDeleted
+        hotel.deletedAt = new Date(); //updates the ts obj
+        await hotel.save(); //propogates the changes to db.
+        logger.info(`Hotel with id ${id} soft deleted successfully`);
+        return true
     } catch (error) {
-        if(error instanceof NotFoundError || error instanceof ForbiddenError) {
-            throw error
+        if(error instanceof NotFoundError) {
+            throw error; // rethrowing the NotFoundError to be handled by the controller    
         }
-        throw new InternalServerError(`Error deleting hotel with id ${id} at the repository level.`)
+        throw new InternalServerError(`Error soft deleting hotel with id ${id} at the repository level.`)
     }
 }
 

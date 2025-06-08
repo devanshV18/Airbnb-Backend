@@ -1,9 +1,8 @@
 import { NextFunction, Request, Response } from "express"
-import { createHotelService, deleteHotelByIdService, getAllHotelService, getHotelByIdService } from "../service/hotel.service"
+import { createHotelService, getAllHotelService, getHotelByIdService, softDeleteHotelByIdService } from "../service/hotel.service"
 import { InternalServerError } from "../utils/errors/app.error"
 import logger from "../config/logger.config"
 import { StatusCodes } from "http-status-codes"
-import { STATUS_CODES } from "http"
 
 export const createHotelHandler = async(req: Request, res: Response, next: NextFunction) => {
     try {
@@ -52,14 +51,11 @@ export const getAllHotelsHandler = async(req: Request, res: Response, next: Next
 
 export const deleteHotelByIdHandler = async(req: Request, res: Response, next: NextFunction) => {
     try {
-        const hotel = await getHotelByIdService(Number(req.params.id));
-        const isDeleted = await deleteHotelByIdService(Number(req.params.id));
+        const softDeleteResponse = await softDeleteHotelByIdService(Number(req.params.id)) //either true or error (caught in catch block)
 
         res.status(StatusCodes.OK).json({
-            success: true,
-            message: `Hotel with id ${req.params.id} deleted successfully`,
-            data: hotel,
-            Deleted: isDeleted
+            success: softDeleteResponse,
+            message: `Hotel with id ${req.params.id} soft deleted successfully`,
         })
 
     } catch (error) {

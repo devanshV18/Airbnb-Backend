@@ -1,4 +1,4 @@
-import { createHotel,deleteHotelById,getAllHotels, getHotelbyId } from "../repositories/hotel.repository";
+import { createHotel, getAllHotels, getHotelbyId, softDeleteHotelById } from "../repositories/hotel.repository";
 import { createHotelDto } from "../dto/hotel.dto";
 import { ForbiddenError } from "../utils/errors/app.error";
 
@@ -26,8 +26,8 @@ export async function getAllHotelService(){
     return hotels;
 }
 
-export async function deleteHotelByIdService(id: number){
-    const isDeleted = await deleteHotelById(id);
-    return isDeleted;
+export async function softDeleteHotelByIdService(id: number){
+    const response = await softDeleteHotelById(id);
+    return response;
 }
 
