@@ -12,9 +12,6 @@ WRITING API THE BOTTOM UP WAY
 
 6 embed validators to the routes
 
-//todo -> getAllHotelhandler, deleteHotelHandlerbyId, UpdateHotelHandler
-
-
 
 ### VVVVIII
 his is called the error-handling middleware — like your genericErrorHandler.
