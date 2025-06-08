@@ -45,3 +45,4 @@ export const getAllHotelsHandler = async(req: Request, res: Response, next: Next
         throw new InternalServerError("Error retrieving hotels at controller level");
     }
 }
+

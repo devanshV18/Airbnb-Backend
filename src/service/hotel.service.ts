@@ -1,4 +1,4 @@
-import { createHotel, getAllHotels, getHotelbyId } from "../repositories/hotel.repository";
+import { createHotel,getAllHotels, getHotelbyId } from "../repositories/hotel.repository";
 import { createHotelDto } from "../dto/hotel.dto";
 import { ForbiddenError } from "../utils/errors/app.error";
 
@@ -25,3 +25,4 @@ export async function getAllHotelService(){
     const hotels = await getAllHotels()
     return hotels;
 }
+
