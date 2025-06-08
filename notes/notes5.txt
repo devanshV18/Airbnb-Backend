@@ -13,3 +13,17 @@ WRITING API THE BOTTOM UP WAY
 6 embed validators to the routes
 
 //todo -> getAllHotelhandler, deleteHotelHandlerbyId, UpdateHotelHandler
+
+
+
+### VVVVIII
+his is called the error-handling middleware — like your genericErrorHandler.
+
+How do errors reach it?
+There are two ways:
+
+next(error) — this is the official, Express way to forward an error to the error middleware.
+
+throw error — works too if you’re using async/await, because Express handles rejected promises using next(error) under the hood.
+
+so for async functions do return next(,..............("Error")) #########
