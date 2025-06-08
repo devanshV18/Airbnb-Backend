@@ -27,3 +27,120 @@ next(error) — this is the official, Express way to forward an error to the err
 throw error — works too if you’re using async/await, because Express handles rejected promises using next(error) under the hood.
 
 so for async functions do return next(,..............("Error")) #########
+
+
+############ COMPLETE ERROR FLOW UNDERSTANDING ###########
+
+Yes Devansh — you're **exactly right**. Let's walk through your understanding step by step to make it **100% crystal clear**, using simple terms and visuals.
+
+---
+
+## ✅ Scenario: Throwing an error in the Repository layer
+
+You wrote this in your **repository**:
+
+```ts
+if (!hotelExists) {
+   throw new NotFoundError("Hotel not found");
+}
+```
+
+### What happens next?
+
+---
+
+## 🔁 Step-by-Step Flow:
+
+### 1️⃣ **Repository Layer** (lowest layer)
+
+* The function is `async`.
+* When you `throw` inside it, it rejects the Promise:
+
+```ts
+throw new NotFoundError("Hotel not found");
+```
+
+👉 This behaves the same as:
+
+```ts
+return Promise.reject(new NotFoundError(...));
+```
+
+---
+
+### 2️⃣ **Service Layer** (middle layer)
+
+You wrote:
+
+```ts
+export async function deleteHotelByIdService(id: number){
+    const isDeleted = await deleteHotelById(id); // ← awaits repo layer
+    return isDeleted;
+}
+```
+
+* Since `deleteHotelById(id)` throws an error, that means:
+
+```ts
+await deleteHotelById(id);
+```
+
+* This line causes an **unhandled rejection**, so the \`error travels up to the caller\*\*, i.e., the controller.
+
+🧠 Important: You didn't handle the error here with try/catch — so it **bubbles up to the controller**.
+
+---
+
+### 3️⃣ **Controller Layer** (top layer)
+
+You wrote:
+
+```ts
+try {
+   const isDeleted = await deleteHotelByIdService(id);
+} catch (error) {
+   if (error instanceof NotFoundError) throw error;
+   throw new InternalServerError(...);
+}
+```
+
+* Now the `catch` block catches the error thrown from the repo layer.
+* You either:
+
+  * **re-throw it** (to be handled by global error middleware), or
+  * **transform it** to another error type.
+
+---
+
+### 4️⃣ **Error Middleware**
+
+Since Express sees that an error was thrown or passed via `next(error)`, it finally invokes:
+
+```ts
+app.use(genericErrorHandler); // your global handler
+
+function genericErrorHandler(err, req, res, next) {
+   res.status(err.statusCode).json({ success: false, message: err.message });
+}
+```
+
+---
+
+## ✅ Summary: What You Said — Explained in Simple Terms
+
+> ❓ “If I throw any error in the repo layer → it goes to the service layer where no error handling is done → so the error reaches the controller layer where I call the service using `await` — is this correct?”
+
+**✅ YES. 100% correct.**
+
+### In Short:
+
+| Layer         | What Happens                                                                            |
+| ------------- | --------------------------------------------------------------------------------------- |
+| Repository    | `throw error` → rejects the async function                                              |
+| Service       | `await repo()` → Promise rejected, no catch, so error moves on                          |
+| Controller    | `await service()` → Promise rejected → caught in try/catch block                        |
+| Error Handler | If controller throws or calls `next(error)`, Express routes it to `genericErrorHandler` |
+
+---
+
+Let me know if you want a **visual flowchart** of this process — I can create one to help cement the concept.

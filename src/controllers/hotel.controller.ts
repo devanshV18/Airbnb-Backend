@@ -13,6 +13,8 @@ export const createHotelHandler = async(req: Request, res: Response, next: NextF
             data: hotelResponse
         })
 
+        logger.info(`Hotel created successfully: ${hotelResponse.id}`)
+
     } catch (error) {
         throw new InternalServerError("Error creating hotel at controller level");
     }
@@ -29,7 +31,7 @@ export const getHotelByIdHandler = async(req: Request, res: Response, next: Next
         });
 
     } catch (error) {
-        throw new NotFoundError(`Hotel with id ${req.params.id} not found at controller level`);
+        next(error)
     }
 }
 
@@ -42,7 +44,7 @@ export const getAllHotelsHandler = async(req: Request, res: Response, next: Next
             data: hotelsResponse
         })
     } catch (error) {
-        throw new InternalServerError("Error retrieving hotels at controller level");
+        next(error)
     }
 }
 

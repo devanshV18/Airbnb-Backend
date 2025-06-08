@@ -23,10 +23,12 @@ export async function getHotelbyId(id: number){
         logger.info(`Hotel found: ${hotel.id}`);
         return hotel
        } catch (error) {
-        throw new InternalServerError(`Error fetching hotel with id ${id} at the repository level.`)
-       }
-}
-
+            if(error instanceof NotFoundError) {
+                throw error; // rethrowing the NotFoundError to be handled by the controller    
+            }
+            throw new InternalServerError(`Error fetching hotel with id ${id} at the repository level.`)
+        }
+    }
 export async function getAllHotels(){
     try {
         const hotels = await Hotel.findAll();

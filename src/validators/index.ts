@@ -6,7 +6,7 @@ export function validateRequestBody(schema: AnyZodObject) {
     return async(req: Request, res:Response, next:NextFunction) => {
         try{
             logger.info("validating request body")
-            await schema.parseAsync(req.body) //waiting till we get a success or failed validation response.
+            await schema.parseAsync(req.body) //waiting till we get a success or failed validation response. -> failed == prmoise rejected -> control goes to catch block
             logger.info("Validation Successfull")
             next()
         }   
