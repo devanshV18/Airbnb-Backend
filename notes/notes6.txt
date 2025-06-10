@@ -38,3 +38,14 @@ Manual Implementation Steps:-
 3. update the model file accordingly
 4. write repository level logic in softDelte fxn also edit getAllhotels fxn by adding where deletedAt : null to get only not soft deleted hotels.
 5. subsequently compelte other layers.
+
+
+In DB there is a concept called triggers related to stored procedure.
+
+stored procedure -> just as we have a function/method in programming languages, the same for DB is called stored procedures.
+
+Triggers -> Those kind of life cycle event, if something happens to the data in the db (event) based on that happening, we can perfrom any operation just before of after the occurence of that event.
+
+ex- a trigger before something is inserted in the db: we can trigger or invoke a stored procedure(any logic pre written )attached to the trigger. just before any insetion occurs, <--- just an example scenario
+
+Hooks: hooks is same as triggers in ORMs like mongoose or sequelize. Hence hooks are nothing but functions which can be called before or after any sequelize call (event) In Sequelize hooks can only be used with models not instances.
