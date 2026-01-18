@@ -2,12 +2,16 @@ package com.codingshuttle.projects.airBnbApp.service;
 
 import com.codingshuttle.projects.airBnbApp.dto.HotelDto;
 import com.codingshuttle.projects.airBnbApp.entity.Hotel;
+import com.codingshuttle.projects.airBnbApp.entity.Room;
 import com.codingshuttle.projects.airBnbApp.exception.ResourceNotFoundException;
 import com.codingshuttle.projects.airBnbApp.repository.HotelRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDate;
 
 @Service
 @Slf4j
@@ -16,6 +20,7 @@ public class HotelServiceImpl implements HotelService {
 
     private final HotelRepository hotelRepository;
     private final ModelMapper modelMapper;
+    private final InventoryService inventoryService;
 
     @Override
     public HotelDto createNewHotel(HotelDto hotelDto) {
@@ -47,13 +52,34 @@ public class HotelServiceImpl implements HotelService {
     }
 
     @Override
+    @Transactional
     public void deleteHotelById(Long id) {
-        boolean exists = hotelRepository.existsById(id);
-        if(!exists){
-            throw new ResourceNotFoundException("hotel not found with Id " + id);
-        }
+        Hotel hotel = hotelRepository
+                .findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("hotel not found with Id " + id));
         hotelRepository.deleteById(id);
         //TODO: delete the future inventories of this deleted hotel.
+        for(Room room: hotel.getRooms()){
+            inventoryService.deleteFututreInventories(room);
+
+        }
+    }
+
+    @Override
+    @Transactional
+    public void activateHotel(Long id) {
+        log.info("Activating Hotel with hotel ID " + id);
+        boolean exists = hotelRepository.existsById(id);
+        Hotel hotel = hotelRepository
+                        .findById(id)
+                        .orElseThrow(() -> new ResourceNotFoundException("hotel not found with Id " + id));
+        hotel.setActive(true);
+
+        //TODO: CREATE INVENTORY FOR ALL THE ROOMS in this hotel -> basically once we activate any hotel in this service we then need to go thru all rooms belonging to this hotel and create its inventory for a year.
+
+        for(Room room: hotel.getRooms()){
+            inventoryService.initializeRoomsForAYear(room);
+        }
     }
 
 
