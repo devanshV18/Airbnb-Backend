@@ -5,13 +5,12 @@ import com.codingshuttle.projects.airBnbApp.entity.Hotel;
 import com.codingshuttle.projects.airBnbApp.entity.Room;
 import com.codingshuttle.projects.airBnbApp.exception.ResourceNotFoundException;
 import com.codingshuttle.projects.airBnbApp.repository.HotelRepository;
+import com.codingshuttle.projects.airBnbApp.repository.RoomRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.time.LocalDate;
 
 @Service
 @Slf4j
@@ -21,6 +20,7 @@ public class HotelServiceImpl implements HotelService {
     private final HotelRepository hotelRepository;
     private final ModelMapper modelMapper;
     private final InventoryService inventoryService;
+    private final RoomRepository roomRepository;
 
     @Override
     public HotelDto createNewHotel(HotelDto hotelDto) {
@@ -57,12 +57,15 @@ public class HotelServiceImpl implements HotelService {
         Hotel hotel = hotelRepository
                 .findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("hotel not found with Id " + id));
-        hotelRepository.deleteById(id);
+
         //TODO: delete the future inventories of this deleted hotel.
         for(Room room: hotel.getRooms()){
-            inventoryService.deleteFututreInventories(room);
-
+            inventoryService.deleteAllInventories(room);
+            roomRepository.deleteById(room.getId());
         }
+
+        hotelRepository.deleteById(id);
+
     }
 
     @Override
@@ -73,6 +76,7 @@ public class HotelServiceImpl implements HotelService {
         Hotel hotel = hotelRepository
                         .findById(id)
                         .orElseThrow(() -> new ResourceNotFoundException("hotel not found with Id " + id));
+
         hotel.setActive(true);
 
         //TODO: CREATE INVENTORY FOR ALL THE ROOMS in this hotel -> basically once we activate any hotel in this service we then need to go thru all rooms belonging to this hotel and create its inventory for a year.
