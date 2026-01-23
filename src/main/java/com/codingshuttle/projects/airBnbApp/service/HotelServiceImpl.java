@@ -1,6 +1,8 @@
 package com.codingshuttle.projects.airBnbApp.service;
 
 import com.codingshuttle.projects.airBnbApp.dto.HotelDto;
+import com.codingshuttle.projects.airBnbApp.dto.HotelInfoDto;
+import com.codingshuttle.projects.airBnbApp.dto.RoomDto;
 import com.codingshuttle.projects.airBnbApp.entity.Hotel;
 import com.codingshuttle.projects.airBnbApp.entity.Room;
 import com.codingshuttle.projects.airBnbApp.exception.ResourceNotFoundException;
@@ -11,6 +13,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 @Slf4j
@@ -59,7 +63,7 @@ public class HotelServiceImpl implements HotelService {
                 .orElseThrow(() -> new ResourceNotFoundException("hotel not found with Id " + id));
 
         //TODO: delete the future inventories of this deleted hotel.
-        for(Room room: hotel.getRooms()){
+        for (Room room : hotel.getRooms()) {
             inventoryService.deleteAllInventories(room);
             roomRepository.deleteById(room.getId());
         }
@@ -74,16 +78,35 @@ public class HotelServiceImpl implements HotelService {
         log.info("Activating Hotel with hotel ID " + id);
         boolean exists = hotelRepository.existsById(id);
         Hotel hotel = hotelRepository
-                        .findById(id)
-                        .orElseThrow(() -> new ResourceNotFoundException("hotel not found with Id " + id));
+                .findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("hotel not found with Id " + id));
 
         hotel.setActive(true);
 
         //TODO: CREATE INVENTORY FOR ALL THE ROOMS in this hotel -> basically once we activate any hotel in this service we then need to go thru all rooms belonging to this hotel and create its inventory for a year.
 
-        for(Room room: hotel.getRooms()){
+        for (Room room : hotel.getRooms()) {
             inventoryService.initializeRoomsForAYear(room);
         }
+    }
+
+    @Override
+    public HotelInfoDto getHotelInfoById(Long hotelId) {
+        Hotel hotel = hotelRepository
+                .findById(hotelId)
+                .orElseThrow(() -> new ResourceNotFoundException("hotel not found with Id " + hotelId));
+
+        //Picking rooms of the hotel.
+        List<RoomDto> rooms = hotel.getRooms()
+                .stream()
+                .map((element) -> modelMapper.map(element, RoomDto.class))
+                .toList();
+
+        //create a hotelinfo dto ->
+
+        //passing a HotelDto obj for found hotel and rooms (list) to the HotelInfoDto() -> constructor call @AllArgsConstructor annotation handles the rest.
+
+        return new HotelInfoDto(modelMapper.map(hotel, HotelDto.class), rooms);
     }
 
 
