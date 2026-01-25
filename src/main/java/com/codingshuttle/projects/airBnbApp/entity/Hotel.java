@@ -43,7 +43,7 @@ public class Hotel {
     @Column(nullable = false)
     private boolean active;
 
-    @ManyToOne
+    @ManyToOne(optional = false)
     private User owner; //pointing to its manager
 
     @OneToMany(mappedBy = "hotel")
